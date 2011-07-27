@@ -22,6 +22,7 @@ module Primes =
 
     let anyP b smallers =
         Array.exists (fun a -> divides b a) smallers
+    //
 
     let filterRange predicate (i, j) =
         let results = new ResizeArray<int>(j-i+1) // reserve quite a lot of space.
@@ -55,6 +56,3 @@ module Primes =
         | n ->  let ns = int (Math.Ceiling(sqrt(float n)))
                 let smallers = pprimesUnder ns            
                 Array.append smallers (pfilterRange (fun i -> indivisible i smallers) (ns, n-1))
-
-
-
