@@ -1,5 +1,11 @@
 ﻿namespace ParallelAlgorithms
 
+// A simple parallel version of prime sieves.
+
+// Some lessons learned:
+// 1. Functions which are passed as lambda should be inlined (a common optimization)
+// 2. Avoid creating unnecessary data (using filterRange instead of Array.filter)
+
 module Primes =
 
     open System
@@ -10,13 +16,15 @@ module Primes =
     let inline indivisible b divisors =
         Array.forall (fun a -> b%a<>0) divisors
 
+    // divides and anyP functions are kept for reference
+    // The speedup could be 6x if divides is not inline
     let divides a b = b % a = 0
 
     let anyP b smallers =
         Array.exists (fun a -> divides b a) smallers
 
     let filterRange predicate (i, j) =
-        let results = new ResizeArray<int>(j-i+1)
+        let results = new ResizeArray<int>(j-i+1) // reserve quite a lot of space.
         for k = i to j do
             if predicate k then results.Add(k)
         results.ToArray()
