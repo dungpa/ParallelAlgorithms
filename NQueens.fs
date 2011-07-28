@@ -1,11 +1,12 @@
 ﻿namespace ParallelAlgorithms
 
+// Count all solutions of an NQueens problem.
 // Translate from C# version at http://blogs.msdn.com/b/pfxteam/archive/2009/12/09/9934811.aspx#NQueens
 
 // Lessons learned:
 // 1. Use classes and array mutation inside, side effect is kept inside the class.
 // 2. Partially solve problems and use those solutions for parallel execution.
-// 3. When tasks are heavy enough, a small number of tasks still give a good speedup.
+// 3. When tasks are heavy enough, a small number of tasks still gives a good speedup.
 
 module NQueens =
 
@@ -95,4 +96,3 @@ module NQueens =
         Parallel.For(0, n,
             fun i -> solutions.[i] <- boards.[i].countSolutions()) |> ignore
         Array.sum solutions
-
