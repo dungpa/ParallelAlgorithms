@@ -63,5 +63,3 @@ module PI =
             .Range(0, NUM_STEPS)          
             .Select(fun i -> 4.0 / (1.0 + sqr ((float i + 0.5) * steps)))
             .Sum()) * steps
-                    
-

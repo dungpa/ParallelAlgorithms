@@ -1,1 +1,9 @@
-ParallelAlgorithms: NESL and F#
+ParallelAlgorithms:
+
+1. Primes:
+	4x speedup for n = 10000000
+
+2. PI:
+	perform better than C# versions
+	8x speedup with Parallel.ForEach, 5.5x speedup with PLINQ
+
