@@ -7,3 +7,6 @@ ParallelAlgorithms:
 	perform better than C# versions
 	8x speedup with Parallel.ForEach, 5.5x speedup with PLINQ
 
+3. NQueens:
+	perform better than C# versions.
+	8x speedup when pre-placing the first two queens (N = 14).
