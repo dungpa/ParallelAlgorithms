@@ -1,5 +1,4 @@
-ParallelAlgorithms:
-
+Results on an 8-core machine:
 1. Primes:
 	4x speedup for n = 10000000
 
@@ -10,3 +9,6 @@ ParallelAlgorithms:
 3. NQueens:
 	perform better than C# versions.
 	8x speedup when pre-placing the first two queens (N = 14).
+
+4. Sudoku:
+	Failed to parallelize its depth-first search algorithm

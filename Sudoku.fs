@@ -132,7 +132,15 @@ module Sudoku =
             let grid: Board = Array.init sud.Length (fun i -> Array.copy sud.[i])
             let boards = x.generateBoards grid
             printfn "Generated %i boards" boards.Length
-            waitAny(x.solve, boards)
+            // Faster than waitAny function but does not terminate other threads properly.
+            let result = ref None
+            Parallel.For(0, boards.Length, 
+                fun i (loopState: ParallelLoopState) ->
+                        Interlocked.CompareExchange(result, x.solve (boards.[i]), None) |> ignore
+                        printfn "Task %i finished" i
+                        loopState.Stop()) |> ignore
+            !result
+            //waitAny(x.solve, boards)
                 
     let solve(size, sud) =
         let solver = new Solver(size)
