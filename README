@@ -1,4 +1,4 @@
-Results on an 8-core machine:
+Results on an 8-core (hyperthreading) machine:
 1. Primes:
 	4x speedup for n = 10000000
 
@@ -11,4 +11,8 @@ Results on an 8-core machine:
 	8x speedup when pre-placing the first two queens (N = 14).
 
 4. Sudoku:
-	Failed to parallelize its depth-first search algorithm
+	Failed to parallelize its depth-first search algorithm.
+
+5. Strassens:
+	perform better than C# version, but scalability seems to be strange.
+	7x speedup for the standard algorithm, 6x speedup for Strassen's algorithm.
