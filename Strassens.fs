@@ -16,6 +16,8 @@ module Strassens =
     open System.Collections.Concurrent
     open System.Threading.Tasks
 
+    open System.Runtime.InteropServices
+
     type Matrix(_matrix: int []) =
 
         let sqr x = x*x
@@ -74,7 +76,7 @@ module Strassens =
                 
             // Explicitly create buffer arrays.
             let buffer = Array.zeroCreate (9*n_2*n_2)
-            let handle = System.Runtime.InteropServices.GCHandle.Alloc(buffer, System.Runtime.InteropServices.GCHandleType.Pinned)
+            let handle = GCHandle.Alloc(buffer, System.Runtime.InteropServices.GCHandleType.Pinned)
 
             // p1 = (a11 + a22) * (b11 + b22) 
             matrix_add(n_2, n_2,
@@ -225,7 +227,7 @@ module Strassens =
                 
             // Pinning the buffer to delay garbage collection.
             let buffer = Array.zeroCreate (17*n_2*n_2)
-            let handle = System.Runtime.InteropServices.GCHandle.Alloc(buffer, System.Runtime.InteropServices.GCHandleType.Pinned)
+            let handle = GCHandle.Alloc(buffer, System.Runtime.InteropServices.GCHandleType.Pinned)
 
             // p1 = (a11 + a22) * (b11 + b22)
             let t_p1 = Task.Factory.StartNew( fun () ->  
@@ -420,10 +422,4 @@ module Strassens =
             let N = C.Size
             strassen_mult_parallel(N, A.Value, 0, 0, N, B.Value, 0, 0, N, C.Value, 0, 0, N, 64)
             C
-
-
-
-
-
-
 
