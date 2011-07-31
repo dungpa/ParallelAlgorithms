@@ -4,7 +4,7 @@
 // Translate from C# version at http://blogs.msdn.com/b/pfxteam/archive/2009/12/09/9934811.aspx#Strassens
 
 // Lessons learned:
-// 1. Pin arrays using GCHandle to avoid garbage collection's effect in parallelism.s
+// 1. Pin arrays using GCHandle to avoid garbage collection's effect in parallelism.
 // 2. Use indices to segment an array logically.
 // 3. Strassen's algorithm is cache-oblivious, but it scales worse than the standard algorithm (need more optimizations).
 // 4. Use 1-d arrays to represent matrix for better performance.
@@ -339,15 +339,15 @@ module Strassens =
                 matrix_add(n_2, n_2,
                     buffer, 10*n_2, 0, n_2,
                     buffer, 13*n_2, 0, n_2,
-                    C, cx, cy, cS)
+                    buffer, 0, 0, n_2)
                 matrix_sub(n_2, n_2,
-                    C, cx, cy, cS,
+                    buffer, 0, 0, n_2,
                     buffer, 14*n_2, 0, n_2,
-                    C, cx, cy, cS)
+                    buffer, 0, 0, n_2)
                 matrix_add(n_2, n_2,
-                    C, cx, cy, cS,
+                    buffer, 0, 0, n_2,
                     buffer, 16*n_2, 0, n_2,
-                    C, cx, cy, cS))
+                    C, cx, cy, cS)) // Be careful with buffer's indices, easy to deadlock
 
             // c12 = p3 + p5 
             let t_c12 = Task.Factory.StartNew( fun () -> 
@@ -368,13 +368,13 @@ module Strassens =
                 matrix_add(n_2, n_2,
                     buffer, 10*n_2, 0, n_2,
                     buffer, 12*n_2, 0, n_2,
-                    C, cx + n_2, cy + n_2, cS)
+                    buffer, n_2, 0, n_2)
                 matrix_sub(n_2, n_2,
-                    C, cx + n_2, cy + n_2, cS,
+                    buffer, n_2, 0, n_2,
                     buffer, 11*n_2, 0, n_2,
-                    C, cx + n_2, cy + n_2, cS)
+                    buffer, n_2, 0, n_2)
                 matrix_add(n_2, n_2,
-                    C, cx + n_2, cy + n_2, cS,
+                    buffer, n_2, 0, n_2,
                     buffer, 15*n_2, 0, n_2,
                     C, cx + n_2, cy + n_2, cS))
 
