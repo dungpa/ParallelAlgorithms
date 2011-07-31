@@ -6,7 +6,7 @@
 // Lessons learned:
 // 1. Pin arrays using GCHandle to avoid garbage collection's effect in parallelism.s
 // 2. Use indices to segment an array logically.
-// 3. Strassen's algorithm is cache-oblivibous, but it scales worse than the standard algorithm in the implementation (need more optimizations).
+// 3. Strassen's algorithm is cache-oblivious, but it scales worse than the standard algorithm (need more optimizations).
 // 4. Use 1-d arrays to represent matrix for better performance.
 
 module Strassens =
