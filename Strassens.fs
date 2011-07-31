@@ -63,7 +63,7 @@ module Strassens =
                             tmp <- tmp + A.[(i+ax)*aS+k+ay] * B.[(k+bx)*bS+j+by]
                         C.[(i+cx)*cS+j+cy] <- tmp) |> ignore
 
-    // s: Strassen's recursion limit for array dimensions 
+    // s = Strassen's recursion limit for array dimensions 
     let rec private strassen_mult_serial(n, A: _ [], ax, ay, aS, B: _ [], bx, by, bS, C: _ [], cx, cy, cS, s) =
         if n <= s then
             matrix_mult_serial(
@@ -76,142 +76,142 @@ module Strassens =
                 
             // Explicitly create buffer arrays.
             let buffer = Array.zeroCreate (9*n_2*n_2)
-            let handle = GCHandle.Alloc(buffer, System.Runtime.InteropServices.GCHandleType.Pinned)
+            let handle = GCHandle.Alloc(buffer, GCHandleType.Pinned)
 
             // p1 = (a11 + a22) * (b11 + b22) 
             matrix_add(n_2, n_2,
                 A, ax, ay, aS,
                 A, ax + n_2, ay + n_2, aS,
-                buffer,0,0, n_2)
+                buffer, 0, 0, n_2)
             matrix_add(n_2, n_2,
                 B, bx, by, bS,
                 B, bx + n_2, by + n_2, bS,
-                buffer,n_2,0, n_2)
+                buffer, n_2, 0, n_2)
             strassen_mult_serial(
                 n_2,
                 buffer,0,0, n_2,
-                buffer,n_2,0, n_2,
-                buffer,2*n_2,0, n_2,
+                buffer, n_2, 0, n_2,
+                buffer, 2*n_2, 0, n_2,
                 s)
                 
             // p2 = (a21 + a22) * b11 
             matrix_add(n_2, n_2,
                 A, ax + n_2, ay, aS,
                 A, ax + n_2, ay + n_2, aS,
-                buffer,0,0, n_2)
+                buffer, 0, 0, n_2)
             strassen_mult_serial(
                 n_2,
-                buffer,0,0, n_2,
+                buffer, 0, 0, n_2,
                 B, bx, by, bS,
-                buffer,3*n_2,0, n_2,
+                buffer, 3*n_2, 0, n_2,
                 s)
 
             // p3 = a11 x (b12 - b22) 
             matrix_sub(n_2, n_2,
                 B, bx, by + n_2, bS,
                 B, bx + n_2, by + n_2, bS,
-                buffer,n_2,0, n_2)
+                buffer, n_2, 0, n_2)
             strassen_mult_serial(
                 n_2,
                 A, ax, ay, aS,
-                buffer,n_2,0, n_2,
-                buffer,4*n_2,0, n_2,
+                buffer, n_2, 0, n_2,
+                buffer, 4*n_2, 0, n_2,
                 s)
                 
             // p4 = a22 x (b21 - b11) 
             matrix_sub(n_2, n_2,
                 B, bx + n_2, by, bS,
                 B, bx, by, bS,
-                buffer,n_2,0, n_2)
+                buffer, n_2, 0, n_2)
             strassen_mult_serial(
                 n_2,
                 A, ax + n_2, ay + n_2, aS,
-                buffer,n_2,0, n_2,
-                buffer,5*n_2,0, n_2,
+                buffer, n_2, 0, n_2,
+                buffer, 5*n_2, 0, n_2,
                 s)
 
             // p5 = (a11 + a12) x b22 
             matrix_add(n_2, n_2,
                 A, ax, ay, aS,
                 A, ax, ay + n_2, aS,
-                buffer,0,0, n_2)
+                buffer, 0, 0, n_2)
             strassen_mult_serial(
                 n_2,
                 buffer,0,0, n_2,
                 B, bx + n_2, by + n_2, bS,
-                buffer,6*n_2,0, n_2,
+                buffer, 6*n_2, 0, n_2,
                 s)
                 
             // p6 = (a21 - a11) x (b11 + b12) 
             matrix_sub(n_2, n_2,
                 A, ax + n_2, ay, aS,
                 A, ax, ay, aS,
-                buffer,0,0, n_2)
+                buffer, 0, 0, n_2)
             matrix_add(n_2, n_2,
                 B, bx, by, bS,
                 B, bx, by + n_2, bS,
-                buffer,n_2,0, n_2)
+                buffer, n_2, 0, n_2)
             strassen_mult_serial(
                 n_2,
-                buffer,0,0, n_2,
-                buffer,n_2,0, n_2,
-                buffer,7*n_2,0, n_2,
+                buffer, 0, 0, n_2,
+                buffer, n_2, 0, n_2,
+                buffer, 7*n_2, 0, n_2,
                 s)
 
             // p7 = (a12 - a22) x (b21 + b22) 
             matrix_sub(n_2, n_2,
                 A, ax, ay + n_2, aS,
                 A, ax + n_2, ay + n_2, aS,
-                buffer,0,0, n_2)
+                buffer, 0, 0, n_2)
             matrix_add(n_2, n_2,
                 B, bx + n_2, by, bS,
                 B, bx + n_2, by + n_2, bS,
-                buffer,n_2,0, n_2)
+                buffer, n_2, 0, n_2)
             strassen_mult_serial(
                 n_2,
-                buffer,0,0, n_2,
-                buffer,n_2,0, n_2,
-                buffer,8*n_2,0, n_2,
+                buffer, 0, 0, n_2,
+                buffer, n_2, 0, n_2,
+                buffer, 8*n_2, 0, n_2,
                 s)
 
             // c11 = p1 + p4 - p5 + p7 
             matrix_add(n_2, n_2,
-                buffer,2*n_2,0, n_2,
-                buffer,5*n_2,0, n_2,
+                buffer, 2*n_2, 0, n_2,
+                buffer, 5*n_2, 0, n_2,
                 C, cx, cy, cS)
             matrix_sub(n_2, n_2,
                 C, cx, cy, cS,
-                buffer,6*n_2,0, n_2,
+                buffer, 6*n_2, 0, n_2,
                 C, cx, cy, cS)
             matrix_add(n_2, n_2,
                 C, cx, cy, cS,
-                buffer,8*n_2,0, n_2,
+                buffer, 8*n_2, 0, n_2,
                 C, cx, cy, cS)
 
             // c12 = p3 + p5 
             matrix_add(n_2, n_2,
-                buffer,4*n_2,0, n_2,
-                buffer,6*n_2,0, n_2,
+                buffer, 4*n_2, 0, n_2,
+                buffer, 6*n_2, 0, n_2,
                 C, cx, cy + n_2, cS);
 
             // c21 = p2 + p4 
             matrix_add(n_2, n_2,
-                buffer,3*n_2,0, n_2,
-                buffer,5*n_2,0, n_2,
+                buffer, 3*n_2, 0, n_2,
+                buffer, 5*n_2, 0, n_2,
                 C, cx + n_2, cy, cS);
 
             // c22 = p1 + p3 - p2 + p6 
             matrix_add(n_2, n_2,
-                buffer,2*n_2,0, n_2,
-                buffer,4*n_2,0, n_2,
+                buffer, 2*n_2, 0, n_2,
+                buffer, 4*n_2, 0, n_2,
                 C, cx + n_2, cy + n_2, cS)
             matrix_sub(n_2, n_2,
                 C, cx + n_2, cy + n_2, cS,
-                buffer,3*n_2,0, n_2,
+                buffer, 3*n_2, 0, n_2,
                 C, cx + n_2, cy + n_2, cS)
             matrix_add(n_2, n_2,
                 C, cx + n_2, cy + n_2, cS,
-                buffer,7*n_2,0, n_2,
+                buffer, 7*n_2, 0, n_2,
                 C, cx + n_2, cy + n_2, cS)
             handle.Free()
 
@@ -225,24 +225,24 @@ module Strassens =
         else
             let n_2 = n >>> 1
                 
-            // Pinning the buffer to delay garbage collection.
+            // Pin the buffer to delay garbage collection.
             let buffer = Array.zeroCreate (17*n_2*n_2)
-            let handle = GCHandle.Alloc(buffer, System.Runtime.InteropServices.GCHandleType.Pinned)
+            let handle = GCHandle.Alloc(buffer, GCHandleType.Pinned)
 
             // p1 = (a11 + a22) * (b11 + b22)
             let t_p1 = Task.Factory.StartNew( fun () ->  
                 matrix_add(n_2, n_2,
                     A, ax, ay, aS,
                     A, ax + n_2, ay + n_2, aS,
-                    buffer,0,0, n_2)
+                    buffer, 0, 0, n_2)
                 matrix_add(n_2, n_2,
                     B, bx, by, bS,
                     B, bx + n_2, by + n_2, bS,
-                    buffer,n_2,0, n_2)
+                    buffer, n_2, 0, n_2)
                 strassen_mult_parallel(
                     n_2,
-                    buffer,0,0, n_2,
-                    buffer,n_2,0, n_2,
+                    buffer, 0, 0, n_2,
+                    buffer, n_2, 0, n_2,
                     buffer, 10*n_2, 0, n_2,
                     s))
                 
@@ -422,4 +422,3 @@ module Strassens =
             let N = C.Size
             strassen_mult_parallel(N, A.Value, 0, 0, N, B.Value, 0, 0, N, C.Value, 0, 0, N, 64)
             C
-

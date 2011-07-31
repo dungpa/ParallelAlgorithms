@@ -2,7 +2,7 @@
 
 // Limitations:
 // 1. Strassen's algorithm only works with power-of-two sizes.
-// 2. Strassen's algorithm use GCHandle; the system could run out of memory with huge matrices.
+// 2. Strassen's algorithm uses GCHandle; the system could run out of memory with huge matrices.
 
 open ParallelAlgorithms.Strassens
 
