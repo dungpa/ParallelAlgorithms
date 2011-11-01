@@ -37,8 +37,19 @@
   <Import Project="$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets" Condition="!Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />
   <ItemGroup>
-    <Compile Include="Program.fs" />
     <None Include="README" />
+    <Compile Include="NQueens.fs" />
+    <None Include="NQueens.fsx" />
+    <Compile Include="PI.fs" />
+    <None Include="PI.fsx" />
+    <Compile Include="Primes.fs" />
+    <None Include="Primes.fsx" />
+    <Compile Include="Strassens.fs" />
+    <None Include="Strassens.fsx" />
+    <Compile Include="Sudoku.fs" />
+    <None Include="Sudoku.fsx" />
+    <Compile Include="BootyDivision.fs" />
+    <None Include="BootyDivision.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
