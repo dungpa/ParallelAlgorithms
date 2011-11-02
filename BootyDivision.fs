@@ -14,8 +14,8 @@ type BootyDivider(_itemValues) =
     let mutable depth = 0
 
     // Could use bool array, but use byte to extend for more than 2 dividers.
-    let path = Array.create numItems 0uy
-    let bestPath = Array.create numItems 0uy
+    let path = Array.create numItems 255uy
+    let bestPath = Array.create numItems 255uy
 
     let totalValues = Array.create size 0    
     let bestTotalValues = Array.create size 0 
@@ -70,28 +70,42 @@ type BootyDivider(_itemValues) =
         else ()
         bestDifference
 
+    member x.preassign(level, threadId) =
+        for l in 1..level do
+            if threadId &&& (pown 2 l) <> 0 then
+                path.[depth] <- 1uy
+                totalValues.[1] <- totalValues.[1] + itemValues.[level-l]
+                depth <- depth + 1        
+            else
+                path.[depth] <- 0uy
+                totalValues.[0] <- totalValues.[0] + itemValues.[level-l]
+                depth <- depth + 1  
+
+    // Preassign the divider with some configurations.
+    member x.preassignBB(level, threadId) =
+        for l in 1..level do
+            if threadId &&& (pown 2 l) <> 0 then
+                path.[depth] <- 1uy
+                totalValues.[1] <- totalValues.[1] + itemValues.[depth]
+                totalUnassigned <- totalUnassigned - itemValues.[depth]
+                depth <- depth + 1        
+            else
+                path.[depth] <- 0uy
+                totalValues.[0] <- totalValues.[0] + itemValues.[depth]
+                totalUnassigned <- totalUnassigned - itemValues.[depth]
+                depth <- depth + 1        
+
 let solve(itemValues) =
     let bd = new BootyDivider(itemValues)
     bd.divide()
 
-let solveBB(itemValues) =
-    let bd = new BootyDivider(itemValues)
-    bd.divideBB()
-
-let inline toBinaryList n = 
-    let rec util(n, acc) =
-        match n with
-        | 0 -> acc
-        | _ -> util(n/2, n%2::acc)
-    util(n, [])
-
+// This version is aligned with the parallel version.
 let solve2(itemValues, level) =
-    let count = pown 2 level
+    let count = pown 2 (level-1)
     // Setup different booty dividers with different configurations.
     let bds = Array.init count (fun _ -> new BootyDivider(itemValues))
     for i in 0..count-1 do
-        let ls = toBinaryList i
-        List.iter (fun j -> bds.[i].select(j)) ls
+        bds.[i].preassign(level, i)
 
     let solutions = Array.zeroCreate count
     for i in 0..count-1 do
@@ -103,21 +117,23 @@ let solveParallel(itemValues, level) =
     // Setup different booty dividers with different configurations.
     let bds = Array.init count (fun _ -> new BootyDivider(itemValues))
     for i in 0..count-1 do
-        let ls = toBinaryList i
-        List.iter (fun j -> bds.[i].select(j)) ls
+        bds.[i].preassign(level, i)
 
     let solutions = Array.zeroCreate count
     Parallel.For(0, count,
-        fun i -> solutions.[i] <- bds.[i].divideBB()) |> ignore
+        fun i -> solutions.[i] <- bds.[i].divide()) |> ignore
     Array.min solutions
+
+let solveBB(itemValues) =
+    let bd = new BootyDivider(itemValues)
+    bd.divideBB()
 
 let solveBBParallel(itemValues, level) =
     let count = pown 2 level
     // Setup different booty dividers with different configurations.
     let bds = Array.init count (fun _ -> new BootyDivider(itemValues))
     for i in 0..count-1 do
-        let ls = toBinaryList i
-        List.iter (fun j -> bds.[i].select(j)) ls
+        bds.[i].preassignBB(level, i)
 
     let solutions = Array.zeroCreate count
     Parallel.For(0, count,

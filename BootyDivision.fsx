@@ -5,7 +5,7 @@ open ParallelAlgorithms.BootyDivision
 let minValue = 30
 let maxValue = 50
 let numItems = 25
-let level = 5
+let level = 10
 let rnd = new System.Random()
 let itemValues = Array.init numItems (fun _ -> rnd.Next(minValue, maxValue+1));;
 
