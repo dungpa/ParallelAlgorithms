@@ -50,8 +50,11 @@
     <None Include="Sudoku.fsx" />
     <Compile Include="BootyDivision.fs" />
     <None Include="BootyDivision.fsx" />
+    <Compile Include="Geonames.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.PowerPack.Parallel.Seq, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a19089b1c74d0809" />
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core" />
     <Reference Include="System" />

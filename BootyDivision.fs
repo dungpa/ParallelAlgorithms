@@ -13,7 +13,7 @@ type BootyDivider(_itemValues) =
     let size = 2
     let mutable depth = 0
 
-    // Could use bool array, but use byte to extend for more than 2 dividers.
+    // Could use bool array, but use byte array to extend for more than 2 dividers.
     let path = Array.create numItems 255uy
     let bestPath = Array.create numItems 255uy
 
