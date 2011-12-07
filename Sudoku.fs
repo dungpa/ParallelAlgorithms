@@ -134,11 +134,14 @@ module Sudoku =
             printfn "Generated %i boards" boards.Length
             // Faster than waitAny function but does not terminate other threads properly.
             let result = ref None
+            let monitor = new Object()
             Parallel.For(0, boards.Length, 
                 fun i (loopState: ParallelLoopState) ->
-                        Interlocked.CompareExchange(result, x.solve (boards.[i]), None) |> ignore
-                        printfn "Task %i finished" i
-                        loopState.Stop()) |> ignore
+                        let r = x.solve (boards.[i])
+                        if r <> None then                            
+                            lock monitor (fun () -> result := r)
+                            printfn "Task %i finished" i
+                            loopState.Stop()) |> ignore
             !result
             //waitAny(x.solve, boards)
                 

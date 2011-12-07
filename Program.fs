@@ -26,5 +26,5 @@ let run (inFile, degreeOfParallelism, mode) =
     Console.WriteLine("Total Elapsed time: {0}.{1} seconds.", watch.ElapsedMilliseconds / 1000L, watch.ElapsedMilliseconds % 1000L)
     watch.Stop()
 
-run("Data/allcountries.txt", 10, PARALLEL)
+run("Data/allcountries.txt", 10, PLINQ)
 Console.ReadKey() |> ignore

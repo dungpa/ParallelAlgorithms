@@ -50,6 +50,8 @@
     <None Include="Sudoku.fsx" />
     <Compile Include="BootyDivision.fs" />
     <None Include="BootyDivision.fsx" />
+    <Compile Include="Mersenne.fs" />
+    <None Include="Mersenne.fsx" />
     <Compile Include="Geonames.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

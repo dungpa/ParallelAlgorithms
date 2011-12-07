@@ -26,3 +26,7 @@ Results on an 8-core (hyperthreading) machine:
 7. Geonames:
 	Speedups are marginal due to sequential IO operation.
 	Two versions using PLINQ and Parallel.ForEach are comparable for seq.
+
+8. Mersenne:
+	Speedups are comparable between PSeq version and Parallel.For version
+	They are 3.5x on a quadcore machine.
