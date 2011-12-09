@@ -10,7 +10,7 @@ module WavefrontAlgorithm =
     /// <param name="numRows">The number of rows in the matrix.</param> 
     /// <param name="numColumns">The number of columns in the matrix.</param> 
     /// <param name="processRowColumnCell">The action to invoke for every cell, supplied with the row and column indices.</param>
-    let wavefrontForCell(numRows, numColumns, processRowColumnCell: _ -> _ -> unit) =
+    let wavefrontForCell numRows numColumns (processRowColumnCell: _ -> _ -> unit) =
         // Validate parameters 
         if numRows <= 0 then invalidArg "wavefront" "numRows"
         elif numColumns <=0 then invalidArg "wavefront" "numColumns"
@@ -47,7 +47,7 @@ module WavefrontAlgorithm =
     /// <param name="numBlocksPerRow">Partition the matrix into this number of blocks along the rows.</param> 
     /// <param name="numBlocksPerColumn">Partition the matrix into this number of blocks along the columns.</param> 
     /// <param name="processBlock">The action to invoke for every block, supplied with the start and end indices of the rows and columns.</param> 
-    let wavefront(numRows, numColumns, numBlocksPerRow, numBlocksPerColumn, processBlock) =
+    let wavefront numRows numColumns numBlocksPerRow numBlocksPerColumn processBlock =
         if numRows <= 0 then invalidArg "wavefront" "numRows"
         elif numColumns <=0 then invalidArg "wavefront" "numColumns"
         elif numBlocksPerRow <= 0 || numBlocksPerRow > numRows then invalidArg "wavefront" "numBlocksPerRow"
@@ -61,7 +61,7 @@ module WavefrontAlgorithm =
                 let startJ = column * columnBlockSize
                 let endJ = if column < numBlocksPerColumn - 1 then startJ + columnBlockSize else numColumns
                 processBlock startI endI startJ endJ
-            wavefrontForCell(numBlocksPerRow, numBlocksPerColumn, processRowColumnCell)
+            wavefrontForCell numBlocksPerRow numBlocksPerColumn processRowColumnCell
 
 module EditDistance =
     open System
@@ -100,5 +100,5 @@ module EditDistance =
                     else
                         dist.[i, j] <- 1 + min dist.[i-1, j] (min dist.[i, j-1] dist.[i-1, j-1])       
                              
-        wavefront(s1.Length, s2.Length, numBlocks, numBlocks, processBlock)
+        wavefront s1.Length s2.Length numBlocks numBlocks processBlock
         dist.[s1.Length, s2.Length]

@@ -4,6 +4,8 @@
 
 open System
 open System.Threading.Tasks
+open System.Collections.Concurrent
+
 open Microsoft.FSharp.Collections
 
 let inline PowShift exp = 1I <<< exp
@@ -70,3 +72,21 @@ let runPerfectsPar(n: int) =
     results.Sort()
     results.ToArray()
 
+// More complex, but just slightly better than runPerfectsPar
+let runPerfectsPar2(n: int) =
+    let size = Environment.ProcessorCount * 256
+    let rangeSize = n / size
+    let partitions = Partitioner.Create(0, n, if rangeSize >= 1 then rangeSize else 1)
+    let output = Array.zeroCreate size
+
+    Parallel.ForEach(
+        partitions, new ParallelOptions(), 
+        (fun (min, max) _ ->     
+            let localList = new ResizeArray<_>(n)
+            for i in min+1..max do                     
+                if i = 2 || (isPrime (bigint i) && lucasLehmer i) then
+                    let p = PowShift i
+                    localList.Add(i, (p/2I) * (p-1I))
+            output.[min/rangeSize] <- localList)) |> ignore
+
+    output |> Array.collect(fun ra -> ra.ToArray()) |> Array.sort

@@ -11,3 +11,4 @@ let m2 = runPerfectsPSeq N;;
 
 let m3 = runPerfects N;;
 let m4 = runPerfectsPar N;;
+let m5 = runPerfectsPar2 N;;
