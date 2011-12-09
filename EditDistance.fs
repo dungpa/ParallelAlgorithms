@@ -1,5 +1,8 @@
 ﻿namespace ParallelAlgorithms
 
+// Note:
+// Dynamic programming is still parallelizable in some cases.
+// The curried version is lighter than the tuple version.
 module WavefrontAlgorithm =
     open System.Threading.Tasks
 
@@ -7,7 +10,7 @@ module WavefrontAlgorithm =
     /// <param name="numRows">The number of rows in the matrix.</param> 
     /// <param name="numColumns">The number of columns in the matrix.</param> 
     /// <param name="processRowColumnCell">The action to invoke for every cell, supplied with the row and column indices.</param>
-    let wavefrontForCell(numRows, numColumns, processRowColumnCell: _ -> unit) =
+    let wavefrontForCell(numRows, numColumns, processRowColumnCell: _ -> _ -> unit) =
         // Validate parameters 
         if numRows <= 0 then invalidArg "wavefront" "numRows"
         elif numColumns <=0 then invalidArg "wavefront" "numColumns"
@@ -23,16 +26,16 @@ module WavefrontAlgorithm =
                 for c = 0 to numColumns-1 do
                    let task =
                        if r=0 && c=0 then
-                            Task.Factory.StartNew(fun () -> processRowColumnCell(r, c))
+                            Task.Factory.StartNew(fun () -> processRowColumnCell r c)
                        elif r=0 || c=0 then
                             // Tasks in the left-most column depend only on the task above them, and 
                             // tasks in the top row depend only on the task to their left 
                             let antecedent = if c=0 then prevTaskRow.[0] else Option.get prevTaskCurrentRow
-                            antecedent.ContinueWith(fun (p: Task) -> p.Wait(); processRowColumnCell(r, c))
+                            antecedent.ContinueWith(fun (p: Task) -> p.Wait(); processRowColumnCell r c)
                        else
                             dependencies.[0] <- Option.get prevTaskCurrentRow
                             dependencies.[1] <- prevTaskRow.[c]
-                            Task.Factory.ContinueWhenAll(dependencies, fun ps -> Task.WaitAll(ps); processRowColumnCell(r, c))
+                            Task.Factory.ContinueWhenAll(dependencies, fun ps -> Task.WaitAll(ps); processRowColumnCell r c)
                    prevTaskRow.[c] <- task
                    prevTaskCurrentRow <- Some task
             let t = Option.get prevTaskCurrentRow
@@ -52,12 +55,12 @@ module WavefrontAlgorithm =
         else
             let rowBlockSize = numRows / numBlocksPerRow
             let columnBlockSize = numColumns / numBlocksPerColumn
-            let inline processRowColumnCell(row, column) =
+            let inline processRowColumnCell row column =
                 let startI = row * rowBlockSize
                 let endI = if row < numBlocksPerRow - 1 then startI + rowBlockSize else numRows
                 let startJ = column * columnBlockSize
                 let endJ = if column < numBlocksPerColumn - 1 then startJ + columnBlockSize else numColumns
-                processBlock(startI, endI, startJ, endJ)
+                processBlock startI endI startJ endJ
             wavefrontForCell(numBlocksPerRow, numBlocksPerColumn, processRowColumnCell)
 
 module EditDistance =
@@ -90,7 +93,7 @@ module EditDistance =
         
         let numBlocks = Environment.ProcessorCount * 4
 
-        let inline processBlock(startI, endI, startJ, endJ) =
+        let inline processBlock startI endI startJ endJ =
             for i = startI+1 to endI do
                 for j = startJ+1 to endJ do
                     if s1.[i-1] = s2.[j-1] then dist.[i, j] <- dist.[i-1, j-1]
