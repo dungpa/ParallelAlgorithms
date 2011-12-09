@@ -52,6 +52,8 @@
     <None Include="BootyDivision.fsx" />
     <Compile Include="Mersenne.fs" />
     <None Include="Mersenne.fsx" />
+    <Compile Include="EditDistance.fs" />
+    <None Include="EditDistance.fsx" />
     <Compile Include="Geonames.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

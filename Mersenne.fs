@@ -9,7 +9,7 @@ open Microsoft.FSharp.Collections
 let inline PowShift exp = 1I <<< exp
 
 // Source at http://stackoverflow.com/questions/2053691/can-the-execution-time-of-this-prime-number-generator-be-improved
-let isPrime ( n : bigint) = 
+let isPrime(n: bigint) = 
     let maxFactor = bigint(sqrt(float n))
     let rec loop testPrime tog =
         if testPrime > maxFactor then true
@@ -47,7 +47,7 @@ let runPerfectsPSeq n =
         |> PSeq.toArray 
 
 // Solutions using for and Parallel.For
-let runPerfects (n: int) =
+let runPerfects(n: int) =
     let results = new ResizeArray<_>(n)
     for i in 1..n do
         if i = 2 || (isPrime (bigint i) && lucasLehmer i) then
@@ -55,7 +55,7 @@ let runPerfects (n: int) =
             results.Add(i, (p/2I) * (p-1I))
     results.ToArray()
     
-let runPerfectsPar (n: int) =
+let runPerfectsPar(n: int) =
     let results = new ResizeArray<_>(n)
     let monitor = new Object()
     Parallel.For(

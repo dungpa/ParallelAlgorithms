@@ -50,7 +50,7 @@ let searchPLINQ(inFile, degreeOfParallelism) =
     |> PSeq.choose (fun line ->  let elevation = extractIntegerField(line, elevationColumn)
                                  if elevation > elevationBound then Some (-elevation, line) else None)
     |> PSeq.sortBy fst
-    |> Seq.map snd (* there's not much calculation => use Seq *)
+    |> Seq.map snd (* there's not much calculation => using Seq *)
 
 // Sequential execution using a ResizeArray
 let searchSequential(inFile) =
