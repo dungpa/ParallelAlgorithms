@@ -7,14 +7,15 @@
 // 2. Avoid creating unnecessary data (using filterRange instead of Array.filter)
 
 open System
-
 open System.Collections.Concurrent
 open System.Threading.Tasks
 
-let inline indivisible b divisors =
-    Array.forall (fun a -> b%a<>0) divisors
+open Microsoft.FSharp.Collections
 
-// divides and anyP functions are kept for reference
+let inline indivisible divisors b =
+    Seq.forall (fun a -> b%a<>0) divisors
+
+// divides and anyP functions are kept for future reference
 // The speedup could be 6x if divides is not inline
 let divides a b = b % a = 0
 
@@ -43,14 +44,62 @@ let pfilterRange predicate (i, j) =
 let rec primesUnder = function
     | n when n<=2 -> [||]
     | 3 ->  [|2|]
-    | n ->  let ns = int (Math.Ceiling(sqrt(float n)))
+    | n ->  let ns = n |> float |> sqrt |> ceil |> int
             let smallers = primesUnder ns
-            Array.append smallers (filterRange (fun i -> indivisible i smallers) (ns, n-1))
+            Array.append smallers (filterRange (indivisible smallers) (ns, n-1))
 
-let rec pprimesUnder = function
+let rec primesUnderParallel = function
     | n when n<=2 ->  [||]
     | 3 ->  [|2|]
     | n when n<=100 -> primesUnder n
-    | n ->  let ns = int (Math.Ceiling(sqrt(float n)))
-            let smallers = pprimesUnder ns            
-            Array.append smallers (pfilterRange (fun i -> indivisible i smallers) (ns, n-1))
+    | n ->  let ns = n |> float |> sqrt |> ceil |> int
+            let smallers = primesUnderParallel ns            
+            Array.append smallers (pfilterRange (indivisible smallers) (ns, n-1))
+
+// Seq versions are more readable but wasted because of using lots of extra sequences.
+let primesUnderSeq n = 
+    let rec loop n = 
+        seq {
+            match n with
+            | _ when n <= 2 -> ()
+            | 3 -> yield 2
+            | _ -> let ns = n |> float |> sqrt |> ceil |> int
+                   let smallers = loop ns
+                   yield! smallers
+                   yield! seq {ns..n-1} |> Seq.filter (indivisible smallers)
+        }
+    loop n
+
+let primesUnderPSeq n = 
+    let rec loop n = 
+        seq {
+            match n with
+            | _ when n <= 2 -> ()
+            | 3 -> yield 2
+            | _ when n<=100 -> yield! primesUnderSeq n
+            | _ -> let ns = n |> float |> sqrt |> ceil |> int
+                   let smallers = loop ns
+                   yield! smallers
+                   yield! seq {ns..n-1} |> PSeq.filter (indivisible smallers)
+        }
+    loop n
+
+// Inefficient versions using Seq
+let primesUnderSeq2 n = 
+    let rec loop = function             
+        | n when n <= 2 -> Seq.empty
+        | 3 -> Seq.singleton 2        
+        | n ->  let ns = n |> float |> sqrt |> ceil |> int
+                let smallers = loop ns
+                seq {ns..n-1} |> Seq.filter (indivisible smallers) |> Seq.append smallers 
+    loop n
+
+let primesUnderPSeq2 n = 
+    let rec loop = function             
+        | n when n <= 2 -> Seq.empty
+        | 3 -> Seq.singleton 2
+        | n when n<=100 -> primesUnderSeq2 n
+        | n ->  let ns = n |> float |> sqrt |> ceil |> int
+                let smallers = loop ns
+                seq {ns..n-1} |> PSeq.filter (indivisible smallers) |> Seq.append smallers 
+    loop n

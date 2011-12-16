@@ -85,7 +85,7 @@ type Solver(initialSize: int) =
         match acc' with
         | _ when acc' = acc -> ()
         | (r,c)::acc'' -> x.removeNumber(r, c, grid)
-                            x.recover(grid, acc, acc'')
+                          x.recover(grid, acc, acc'')
         | _   -> ()
 
     // This is the most trivial way to iterate through the whole range of candidates
@@ -96,13 +96,13 @@ type Solver(initialSize: int) =
             | Some (r, c) -> //printfn "%i %i %i" r c i
                                 if i > grid.Length then None, acc
                                 elif x.safe(i, r, c, grid) then
-                                x.placeNumber(i, r, c, grid)
-                                match sudSolve(1, (r, c)::acc) with
-                                | None, acc' -> x.recover(grid, acc, acc')
-                                                sudSolve(i+1, acc)
-                                | g          -> g
+                                    x.placeNumber(i, r, c, grid)
+                                    match sudSolve(1, (r, c)::acc) with
+                                    | None, acc' -> x.recover(grid, acc, acc')
+                                                    sudSolve(i+1, acc)
+                                    | g          -> g
                                 else
-                                sudSolve (i+1, acc)
+                                    sudSolve (i+1, acc)
             | None        -> Some grid, acc
         fst(sudSolve(1, []))
 
