@@ -21,7 +21,8 @@ type Board(initialSize: int) =
     let bwDiagonals = Array.create (2*size-1) false // bwDiagonals[i] = does backward diagonal i contain a queen?
 
     member x.safe(row) =
-        (not rows.[row]) && (not fwDiagonals.[row + col]) && (not bwDiagonals.[row - col + size - 1])
+        not (rows.[row] || fwDiagonals.[row + col] 
+                        || bwDiagonals.[row - col + size - 1])
 
     member x.placeQueen(row) =
         rows.[row] <- true
@@ -73,10 +74,11 @@ let countParallel1 size =
     for i in 0..size-1 do
         boards.[i].placeQueen(i)
 
-    let solutions = Array.zeroCreate size
-    Parallel.For(0, size,
-        fun i -> solutions.[i] <- boards.[i].countSolutions()) |> ignore
-    Array.sum solutions
+    boards |> Array.Parallel.map (fun b -> b.countSolutions()) |> Array.sum
+//    let solutions = Array.zeroCreate size
+//    Parallel.For(0, size,
+//        fun i -> solutions.[i] <- boards.[i].countSolutions()) |> ignore
+//    Array.sum solutions
 
 // Place two first queens beforehand for parallel execution.
 let countParallel2 size =
@@ -89,8 +91,9 @@ let countParallel2 size =
                 boards.[count].placeQueen(i)
                 boards.[count].placeQueen(j)
                 count <- count+1
-
-    let solutions = Array.zeroCreate n
-    Parallel.For(0, n,
-        fun i -> solutions.[i] <- boards.[i].countSolutions()) |> ignore
-    Array.sum solutions
+    
+    boards |> Array.Parallel.map (fun b -> b.countSolutions()) |> Array.sum
+//    let solutions = Array.zeroCreate n
+//    Parallel.For(0, n,
+//        fun i -> solutions.[i] <- boards.[i].countSolutions()) |> ignore
+//    Array.sum solutions

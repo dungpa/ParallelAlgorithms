@@ -4,7 +4,7 @@ open ParallelAlgorithms.NQueens
 
 #time "on";;
 
-let size = 15;;
+let size = 14;;
 
 let c1 = countSequential1 size;;
 let c2 = countParallel1 size;;
